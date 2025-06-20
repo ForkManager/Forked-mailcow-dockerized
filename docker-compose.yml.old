@@ -1,7 +1,7 @@
 services:
 
     unbound-mailcow:
-      image: harbor.hanstack.com/ghcr.io/mailcow/unbound:1.24
+      image: ghcr.io/mailcow/unbound:1.24
       environment:
         - TZ=${TZ}
         - SKIP_UNBOUND_HEALTHCHECK=${SKIP_UNBOUND_HEALTHCHECK:-n}
@@ -17,7 +17,7 @@ services:
             - unbound
 
     mysql-mailcow:
-      image: harbor.hanstack.com/mariadb:10.11
+      image: mariadb:10.11
       depends_on:
         - unbound-mailcow
         - netfilter-mailcow
@@ -42,7 +42,7 @@ services:
             - mysql
 
     redis-mailcow:
-      image: harbor.hanstack.com/redis:7.4.2-alpine
+      image: redis:7.4.2-alpine
       entrypoint: ["/bin/sh","/redis-conf.sh"]
       volumes:
         - redis-vol-1:/data/
@@ -65,7 +65,7 @@ services:
             - redis
 
     clamd-mailcow:
-      image: harbor.hanstack.com/ghcr.io/mailcow/clamd:1.70
+      image: ghcr.io/mailcow/clamd:1.70
       restart: always
       depends_on:
         unbound-mailcow:
@@ -84,7 +84,7 @@ services:
             - clamd
 
     rspamd-mailcow:
-      image: harbor.hanstack.com/ghcr.io/mailcow/rspamd:2.2
+      image: ghcr.io/mailcow/rspamd:2.2
       stop_grace_period: 30s
       depends_on:
         - dovecot-mailcow
@@ -117,7 +117,7 @@ services:
             - rspamd
 
     php-fpm-mailcow:
-      image: harbor.hanstack.com/ghcr.io/mailcow/phpfpm:1.93
+      image: ghcr.io/mailcow/phpfpm:1.93
       command: "php-fpm -d date.timezone=${TZ} -d expose_php=0"
       depends_on:
         - redis-mailcow
@@ -200,7 +200,7 @@ services:
             - phpfpm
 
     sogo-mailcow:
-      image: harbor.hanstack.com/ghcr.io/mailcow/sogo:1.133
+      image: ghcr.io/mailcow/sogo:1.133
       environment:
         - DBNAME=${DBNAME}
         - DBUSER=${DBUSER}
@@ -251,7 +251,7 @@ services:
             - sogo
 
     dovecot-mailcow:
-      image: harbor.hanstack.com/ghcr.io/mailcow/dovecot:2.33
+      image: ghcr.io/mailcow/dovecot:2.33
       depends_on:
         - mysql-mailcow
         - netfilter-mailcow
@@ -338,7 +338,7 @@ services:
             - dovecot
 
     postfix-mailcow:
-      image: harbor.hanstack.com/ghcr.io/mailcow/postfix:1.80
+      image: ghcr.io/mailcow/postfix:1.80
       depends_on:
         mysql-mailcow:
           condition: service_started
@@ -379,7 +379,7 @@ services:
             - postfix
 
     memcached-mailcow:
-      image: harbor.hanstack.com/memcached:alpine
+      image: memcached:alpine
       restart: always
       environment:
         - TZ=${TZ}
@@ -394,7 +394,7 @@ services:
         - php-fpm-mailcow
         - sogo-mailcow
         - rspamd-mailcow
-      image: harbor.hanstack.com/ghcr.io/mailcow/nginx:1.03
+      image: ghcr.io/mailcow/nginx:1.03
       dns:
         - ${IPV4_NETWORK:-172.22.1}.254
       environment:
@@ -440,7 +440,7 @@ services:
           condition: service_started
         unbound-mailcow:
           condition: service_healthy
-      image: harbor.hanstack.com/ghcr.io/mailcow/acme:1.92
+      image: ghcr.io/mailcow/acme:1.92
       dns:
         - ${IPV4_NETWORK:-172.22.1}.254
       environment:
@@ -478,7 +478,7 @@ services:
             - acme
 
     netfilter-mailcow:
-      image: harbor.hanstack.com/ghcr.io/mailcow/netfilter:1.61
+      image: ghcr.io/mailcow/netfilter:1.61
       stop_grace_period: 30s
       restart: always
       privileged: true
@@ -498,7 +498,7 @@ services:
         - /lib/modules:/lib/modules:ro
 
     watchdog-mailcow:
-      image: harbor.hanstack.com/ghcr.io/mailcow/watchdog:2.08
+      image: ghcr.io/mailcow/watchdog:2.08
       dns:
         - ${IPV4_NETWORK:-172.22.1}.254
       tmpfs:
@@ -571,7 +571,7 @@ services:
             - watchdog
 
     dockerapi-mailcow:
-      image: harbor.hanstack.com/ghcr.io/mailcow/dockerapi:2.11
+      image: ghcr.io/mailcow/dockerapi:2.11
       security_opt:
         - label=disable
       restart: always
@@ -591,7 +591,7 @@ services:
             - dockerapi
 
     olefy-mailcow:
-      image: harbor.hanstack.com/ghcr.io/mailcow/olefy:1.15
+      image: ghcr.io/mailcow/olefy:1.15
       restart: always
       environment:
         - TZ=${TZ}
@@ -610,7 +610,7 @@ services:
             - olefy
 
     ofelia-mailcow:
-      image: harbor.hanstack.com/mcuadros/ofelia:latest
+      image: mcuadros/ofelia:latest
       restart: always
       command: daemon --docker -f label=com.docker.compose.project=${COMPOSE_PROJECT_NAME}
       environment:
@@ -649,7 +649,7 @@ services:
         - dockerapi-mailcow
       environment:
         - TZ=${TZ}
-      image: harbor.hanstack.com/robbertkl/ipv6nat
+      image: robbertkl/ipv6nat
       security_opt:
         - label=disable
       restart: always
